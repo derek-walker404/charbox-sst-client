@@ -4,24 +4,33 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import co.charbox.core.utils.Config;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import co.charbox.domain.model.auth.TokenAuthModel;
 import co.charbox.sst.SSTProperties;
 import co.charbox.sst.utils.DataReceiver;
 import co.charbox.sst.utils.DataSender;
 import co.charbox.sst.utils.MyIOHAndler;
 
-public class SSTClient implements Runnable {
+import com.tpofof.core.App;
+import com.tpofof.core.utils.Config;
+
+@Component
+public class SstClient implements Runnable {
 
 	private final String host;
 	private final int port;
 	private final String deviceId;
 	private final String deviceKey;
+	@Autowired private SstClientChartbotApiClient client;
 
-	public SSTClient(String host, int port, String deviceId, String deviceKey) {
-		this.host = host;
-		this.port = port;
-		this.deviceId = deviceId;
-		this.deviceKey = deviceKey;
+	@Autowired
+	public SstClient(Config config) {
+		host = config.getString("sst.server.ip", "127.0.0.1");
+		port = config.getInt("sst.server.port", 31415);
+		deviceId = config.getString("device.id", "test-dev");
+		deviceKey = config.getString("device.api.key", "asdf123");
 	}
 
 	public void run() {
@@ -29,7 +38,7 @@ public class SSTClient implements Runnable {
 			Socket sock = new Socket(host, port);
 			MyIOHAndler io = new MyIOHAndler(sock);
 			
-			initConnection(io);
+			initConnection(io, client.generateDeviceToken(deviceId, deviceKey, "sst"));
 			
 			instructionLoop:
 			while (true) {
@@ -62,11 +71,14 @@ public class SSTClient implements Runnable {
 		}
 	}
 
-	private void initConnection(MyIOHAndler io) {
+	private void initConnection(MyIOHAndler io, TokenAuthModel token) {
+		if (token == null) {
+			throw new RuntimeException("Could not authenticate with data api.");
+		}
 		System.out.println(">>>Init Connection");
 		try {
 			io.write(deviceId);
-			io.write(deviceKey);
+			io.write(token.getToken());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -95,11 +107,6 @@ public class SSTClient implements Runnable {
 	}
 	
 	public static void main(String[] args) {
-//		String host = "52.4.205.170";
-		String host = Config.get().getString("sst.server.ip", "127.0.0.1");
-		int port = Config.get().getInt("sst.server.port", 31415);
-		String deviceId = Config.get().getString("device.id", "abcde");
-		String deviceKey = Config.get().getString("device.key", "ignore");
-		new SSTClient(host, port, deviceId, deviceKey).run();
+		App.getContext().getBean(SstClient.class).run();
 	}
 }

@@ -4,13 +4,6 @@
   <artifactId>sst-client</artifactId>
   <version>0.1.0</version>
   <name>Server Speed Test Client</name>
-  <dependencies>
-		<dependency>
-			<groupId>co.charbox</groupId>
-			<artifactId>core</artifactId>
-			<version>0.1.0</version>
-		</dependency>
-  </dependencies>
   <build>
 		<plugins>
 			<plugin>
@@ -51,4 +44,16 @@
 			</plugin>
 		</plugins>
 	</build>
+  <dependencies>
+  	<dependency>
+  		<groupId>com.tpofof</groupId>
+  		<artifactId>tpofof-core</artifactId>
+  		<version>0.0.1-SNAPSHOT</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>co.charbox</groupId>
+  		<artifactId>domain</artifactId>
+  		<version>0.1.0</version>
+  	</dependency>
+  </dependencies>
 </project>

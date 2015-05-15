@@ -10,10 +10,12 @@ public class MyIOHAndler {
 
 	private final BufferedWriter bw;
 	private final Scanner scan;
+	private String remoteIp;
 	
 	public MyIOHAndler(Socket sock) throws IOException {
 		this.bw = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()));
 		this.scan = new Scanner(sock.getInputStream());
+		this.remoteIp = sock.getRemoteSocketAddress().toString();
 	}
 	
 	public void write(int i) throws IOException {
@@ -48,5 +50,9 @@ public class MyIOHAndler {
 	public void close() throws IOException {
 		bw.close();
 		scan.close();
+	}
+
+	public String getRemoteIp() {
+		return remoteIp;
 	}
 }
