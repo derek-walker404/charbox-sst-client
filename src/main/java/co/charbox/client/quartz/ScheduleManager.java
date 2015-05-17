@@ -6,6 +6,8 @@ import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.impl.StdSchedulerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import co.charbox.client.quartz.jobs.HeartbeatJob;
@@ -17,6 +19,7 @@ import co.charbox.client.quartz.triggers.PingTriggerProvider;
 import co.charbox.client.quartz.triggers.SstTriggerProvider;
 
 @Component
+@Scope(BeanDefinition.SCOPE_SINGLETON)
 public class ScheduleManager {
 
 	private Scheduler scheduler;

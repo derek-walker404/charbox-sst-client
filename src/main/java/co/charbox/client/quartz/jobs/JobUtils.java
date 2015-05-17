@@ -14,7 +14,7 @@ public class JobUtils {
 	private static final HeartbeatMain heartbeatMain = App.getContext().getBean(HeartbeatMain.class);
 	private static final PingMain pingMain = App.getContext().getBean(PingMain.class);
 	private static final SstMain sstMain = App.getContext().getBean(SstMain.class);
-	private static final ThreadPoolExecutor clientJobExecutor = (ThreadPoolExecutor) Executors.newSingleThreadExecutor();
+	private static final ThreadPoolExecutor clientJobExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
 	
 	public static HeartbeatMain getHeartbeatMain() {
 		return heartbeatMain;

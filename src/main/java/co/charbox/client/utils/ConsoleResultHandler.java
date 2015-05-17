@@ -10,7 +10,7 @@ public class ConsoleResultHandler<ModelT> implements IResultsHandlers<ModelT> {
 	private JsonUtils json;
 	
 	public boolean handle(ModelT model) {
-		System.out.println(json.toJson(model));
+		System.out.println(model.getClass().getSimpleName() + ":\t" + json.toJson(model));
 		return true;
 	}
 

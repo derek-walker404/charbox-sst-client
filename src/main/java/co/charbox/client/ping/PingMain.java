@@ -15,6 +15,7 @@ import co.charbox.client.utils.ConsoleResultHandler;
 import co.charbox.client.utils.IResultsHandlers;
 import co.charbox.domain.model.PingResults;
 
+import com.google.api.client.util.Lists;
 import com.tpofof.core.App;
 import com.tpofof.core.utils.Config;
 import com.tpofof.core.utils.json.JsonUtils;
@@ -23,8 +24,14 @@ import com.tpofof.core.utils.json.JsonUtils;
 public class PingMain implements Runnable {
 
 	@Autowired private Config config;
-	@Autowired private JsonUtils json;
-	@Autowired private List<IResultsHandlers<PingResults>> pingHandlers;
+	private List<IResultsHandlers<PingResults>> pingHandlers;
+	
+	@Autowired
+	public PingMain(CharbotApiPingResultsHanlder apiHandler, JsonUtils json) {
+		pingHandlers = Lists.newArrayList();
+		pingHandlers.add(apiHandler);
+		pingHandlers.add(new ConsoleResultHandler<PingResults>(json));
+	}
 	
 	public void run() {
 		String packetCount = "-c" + config.getInt("ping.count", 10);
@@ -38,10 +45,9 @@ public class PingMain implements Runnable {
 			
 			PingResults pingResults = parse(in);
 			
-			new ConsoleResultHandler<PingResults>(json).handle(pingResults);
-//			for (IResultsHandlers<PingResults> h : pingHandlers) {
-//				h.handle(pingResults);
-//			}
+			for (IResultsHandlers<PingResults> h : pingHandlers) {
+				h.handle(pingResults);
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

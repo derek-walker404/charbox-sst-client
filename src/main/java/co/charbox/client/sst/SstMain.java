@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -18,6 +20,8 @@ import com.tpofof.core.utils.Config;
 
 @Component
 public class SstMain implements Runnable {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(SstMain.class);
 
 	private final String host;
 	private final int port;
@@ -75,7 +79,7 @@ public class SstMain implements Runnable {
 		if (token == null) {
 			throw new RuntimeException("Could not authenticate with data api.");
 		}
-		System.out.println(">>>Init Connection");
+		LOGGER.debug(">>>Init Connection");
 		try {
 			io.write(deviceId);
 			io.write(token.getToken());
@@ -86,7 +90,7 @@ public class SstMain implements Runnable {
 	
 	private void executeDownloadTest(MyIOHAndler io) throws IOException {
 		int size = io.readInt();
-		System.out.println(">>>Download Test: " + size);
+		LOGGER.debug(">>>Download Test: " + size);
 		DataReceiver dr = new DataReceiver(io, size);
 		dr.run();
 		io.write(dr.getDuration());
@@ -94,12 +98,12 @@ public class SstMain implements Runnable {
 	
 	private void executeUploadTest(MyIOHAndler io) throws IOException {
 		int size = io.readInt();
-		System.out.println(">>>Upload Test: " + size);
+		LOGGER.debug(">>>Upload Test: " + size);
 		new DataSender(io, SSTProperties.getDefaultDataChunk(), size).run();
 	}
 	
 	private void executePingTest(MyIOHAndler io) throws IOException {
-		System.out.println(">>>Ping Test...");
+		LOGGER.debug(">>>Ping Test...");
 		long startTime = System.currentTimeMillis();
 		io.write("ping");
 		io.read();

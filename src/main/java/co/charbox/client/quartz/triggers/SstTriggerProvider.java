@@ -3,12 +3,14 @@ package co.charbox.client.quartz.triggers;
 import java.text.ParseException;
 
 import org.quartz.CronExpression;
+import org.springframework.stereotype.Component;
 
+@Component
 public class SstTriggerProvider extends AbstractTriggerProvider {
 
 	@Override
 	protected CronExpression getCron() {
-		String rawCron = getConfig().getString("job.sst.interval", "0 */3 * * * ?");
+		String rawCron = getConfig().getString("job.sst.interval", "0 0 */3 * * ?");
 		try {
 			return new CronExpression(rawCron);
 		} catch (ParseException e) {
@@ -19,7 +21,7 @@ public class SstTriggerProvider extends AbstractTriggerProvider {
 
 	@Override
 	public String getTriggerName() {
-		return "pingres";
+		return "sst";
 	}
 
 	@Override

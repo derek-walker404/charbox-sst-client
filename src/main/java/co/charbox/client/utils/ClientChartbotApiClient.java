@@ -41,7 +41,7 @@ public class ClientChartbotApiClient {
 	}
 
 	public boolean heartbeat(String deviceId, String deviceApiKey) {
-		PostMethod pm = new PostMethod(config.getString("charbot.api.uri", "http://localhost:8080") + "devices/id/" + deviceId + "/hb");
+		PostMethod pm = new PostMethod(config.getString("charbot.api.uri", "http://localhost:8080") + "/devices/id/" + deviceId + "/hb");
 		pm.addRequestHeader(new AuthorizationHeader(deviceId, deviceApiKey));
 		try {
 			return 200 == httpClientProvider.get().executeMethod(pm);
@@ -56,7 +56,7 @@ public class ClientChartbotApiClient {
 	}
 
 	public boolean postPingResults(PingResults model, String deviceId, String deviceApiKey) {
-		PostMethod pm = new PostMethod(config.getString("charbot.api.uri", "http://localhost:8080") + "/ping");
+		PostMethod pm = new PostMethod(config.getString("charbot.api.uri", "http://localhost:8080") + "/pingres");
 		pm.addRequestHeader(new AuthorizationHeader(deviceId, deviceApiKey));
 		try {
 			pm.setRequestEntity(new StringRequestEntity(json.toJson(model), "application/json", "UTF-8"));
