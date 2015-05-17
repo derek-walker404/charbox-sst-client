@@ -1,4 +1,4 @@
-package co.charbox.sst;
+package co.charbox.client.sst;
 
 
 public abstract class SSTProperties {

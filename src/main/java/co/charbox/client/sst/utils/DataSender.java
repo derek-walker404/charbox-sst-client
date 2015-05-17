@@ -1,4 +1,4 @@
-package co.charbox.sst.utils;
+package co.charbox.client.sst.utils;
 
 import java.io.IOException;
 
