@@ -16,6 +16,13 @@ public class MyIOHAndler {
 		this.bw = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()));
 		this.scan = new Scanner(sock.getInputStream());
 		this.remoteIp = sock.getRemoteSocketAddress().toString();
+		if (remoteIp.charAt(0) == '/') {
+			remoteIp = remoteIp.substring(1);
+		}
+		int portDeclaration = remoteIp.indexOf(':');
+		if (portDeclaration > 0) {
+			remoteIp = remoteIp.substring(0, portDeclaration);
+		}
 	}
 	
 	public void write(int i) throws IOException {

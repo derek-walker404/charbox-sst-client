@@ -37,13 +37,13 @@ public class PingMain implements Runnable {
 		String packetCount = "-c" + config.getInt("ping.count", 10);
 		String packetSize = "-s" + config.getInt("ping.packetSize", 24);
 		String uri = config.getString("ping.uri", "localhost");
-		ProcessBuilder pb = new ProcessBuilder("ping", packetCount, "-i0.1", packetSize, uri);
+		ProcessBuilder pb = new ProcessBuilder("ping", packetCount, "-i0.2", packetSize, uri);
 		
 		try {
 			Process proc = pb.start();
 			BufferedReader in = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 			
-			PingResults pingResults = parse(in);
+			PingResults pingResults = parse(in, uri);
 			
 			for (IResultsHandlers<PingResults> h : pingHandlers) {
 				h.handle(pingResults);
@@ -53,7 +53,7 @@ public class PingMain implements Runnable {
 		}
 	}
 	
-	private PingResults parse(BufferedReader in) throws IOException {
+	private PingResults parse(BufferedReader in, String uri) throws IOException {
 		Pattern headerPattern = Pattern.compile("--- .*? ping statistics ---");
 		Pattern packetLossPattern = Pattern.compile("(\\d+) packets transmitted, (\\d+) packets received, ([\\d.]+)% packet loss");
 		Pattern latencyPattern = Pattern.compile("round-trip min/avg/max/stddev = ([\\d.]+)/([\\d.]+)/([\\d.]+)/([\\d.]+) ms");
@@ -63,6 +63,7 @@ public class PingMain implements Runnable {
 		    	Matcher m = packetLossPattern.matcher(in.readLine());
 		    	PingResults results = PingResults.builder()
 		    			.deviceId(config.getString("device.id"))
+		    			.uri(uri)
 		    			.testStartTime(new DateTime())
 		    			.build();
 		    	if (m.find()) {

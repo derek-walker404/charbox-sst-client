@@ -7,6 +7,7 @@ import org.quartz.JobExecutionException;
 public class HeartbeatJob implements Job {
 
 	public void execute(JobExecutionContext context) throws JobExecutionException {
+		System.out.println(getClass().getSimpleName());
 		JobUtils.getClientJobExecutor().execute(JobUtils.getHeartbeatMain());
 	}
 

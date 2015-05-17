@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 public class SstJob implements Job {
 
 	public void execute(JobExecutionContext context) throws JobExecutionException {
+		System.out.println(getClass().getSimpleName());
 		JobUtils.getClientJobExecutor().execute(JobUtils.getSstMain());
 	}
 

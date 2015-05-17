@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 public class PingJob implements Job {
 
 	public void execute(JobExecutionContext context) throws JobExecutionException {
+		System.out.println(getClass().getSimpleName());
 		JobUtils.getClientJobExecutor().execute(JobUtils.getPingMain());
 	}
 
