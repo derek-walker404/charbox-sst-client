@@ -29,7 +29,7 @@ public class PingMain implements Runnable {
 	@Autowired
 	public PingMain(CharbotApiPingResultsHanlder apiHandler, JsonUtils json) {
 		pingHandlers = Lists.newArrayList();
-		pingHandlers.add(apiHandler);
+//		pingHandlers.add(apiHandler);
 		pingHandlers.add(new ConsoleResultHandler<PingResults>(json));
 	}
 	
@@ -54,9 +54,9 @@ public class PingMain implements Runnable {
 	}
 	
 	private PingResults parse(BufferedReader in, String uri) throws IOException {
-		Pattern headerPattern = Pattern.compile("--- .*? ping statistics ---");
-		Pattern packetLossPattern = Pattern.compile("(\\d+) packets transmitted, (\\d+) packets received, ([\\d.]+)% packet loss");
-		Pattern latencyPattern = Pattern.compile("round-trip min/avg/max/stddev = ([\\d.]+)/([\\d.]+)/([\\d.]+)/([\\d.]+) ms");
+		Pattern headerPattern = Pattern.compile("^---.+");
+		Pattern packetLossPattern = Pattern.compile("(\\d+) .+? (\\d+) .+? ([\\d.]+)%");
+		Pattern latencyPattern = Pattern.compile("([\\d.]+)/([\\d.]+)/([\\d.]+)/([\\d.]+) ms");
 		String s = null;
 		while ((s = in.readLine()) != null) {
 		    if (headerPattern.matcher(s).find()) {
