@@ -4,10 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -24,12 +21,13 @@ import com.tpofof.core.utils.json.JsonUtils;
 public class PingMain implements Runnable {
 
 	@Autowired private Config config;
+	@Autowired private PingCliParser parser;
 	private List<IResultsHandlers<PingResults>> pingHandlers;
 	
 	@Autowired
 	public PingMain(CharbotApiPingResultsHanlder apiHandler, JsonUtils json) {
 		pingHandlers = Lists.newArrayList();
-//		pingHandlers.add(apiHandler);
+		pingHandlers.add(apiHandler);
 		pingHandlers.add(new ConsoleResultHandler<PingResults>(json));
 	}
 	
@@ -43,7 +41,7 @@ public class PingMain implements Runnable {
 			Process proc = pb.start();
 			BufferedReader in = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 			
-			PingResults pingResults = parse(in, uri);
+			PingResults pingResults = parser.parse(in, uri, config.getString("device.id"));
 			
 			for (IResultsHandlers<PingResults> h : pingHandlers) {
 				h.handle(pingResults);
@@ -51,37 +49,6 @@ public class PingMain implements Runnable {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-	
-	private PingResults parse(BufferedReader in, String uri) throws IOException {
-		Pattern headerPattern = Pattern.compile("^---.+");
-		Pattern packetLossPattern = Pattern.compile("(\\d+) .+? (\\d+) .+? ([\\d.]+)%");
-		Pattern latencyPattern = Pattern.compile("([\\d.]+)/([\\d.]+)/([\\d.]+)/([\\d.]+) ms");
-		String s = null;
-		while ((s = in.readLine()) != null) {
-		    if (headerPattern.matcher(s).find()) {
-		    	Matcher m = packetLossPattern.matcher(in.readLine());
-		    	PingResults results = PingResults.builder()
-		    			.deviceId(config.getString("device.id"))
-		    			.uri(uri)
-		    			.testStartTime(new DateTime())
-		    			.build();
-		    	if (m.find()) {
-		    		results.setPacketCount(Integer.parseInt(m.group(1)));
-		    		results.setPacketLoss(Double.parseDouble(m.group(3)));
-		    	}
-		    	m = latencyPattern.matcher(in.readLine());
-		    	if (m.find()) {
-		    		int i = 1;
-		    		results.setMinLatency(Double.parseDouble(m.group(i++)));
-		    		results.setAvgLatency(Double.parseDouble(m.group(i++)));
-		    		results.setMaxLatency(Double.parseDouble(m.group(i++)));
-		    		results.setLatencyStdDev(Double.parseDouble(m.group(i++)));
-		    	}
-		    	return results;
-		    }
-		}
-		return null;
 	}
 	
 	public static void main(String[] args) {

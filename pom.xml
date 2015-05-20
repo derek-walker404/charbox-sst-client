@@ -48,7 +48,7 @@
 									implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
 								<transformer
 									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>co.charbox.client.ClientMain</mainClass>
+									<mainClass>co.charbox.client.controller.ControllerMain</mainClass>
 								</transformer>
 							</transformers>
 						</configuration>
