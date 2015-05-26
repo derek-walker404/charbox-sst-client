@@ -13,10 +13,12 @@ import org.springframework.stereotype.Component;
 import co.charbox.client.quartz.jobs.HeartbeatJob;
 import co.charbox.client.quartz.jobs.PingJob;
 import co.charbox.client.quartz.jobs.SstJob;
+import co.charbox.client.quartz.jobs.UpgradeJob;
 import co.charbox.client.quartz.triggers.AbstractTriggerProvider;
 import co.charbox.client.quartz.triggers.HeartbeatTriggerProvider;
 import co.charbox.client.quartz.triggers.PingTriggerProvider;
 import co.charbox.client.quartz.triggers.SstTriggerProvider;
+import co.charbox.client.quartz.triggers.UpgradeTriggerProvider;
 
 @Component
 @Scope(BeanDefinition.SCOPE_SINGLETON)
@@ -27,6 +29,8 @@ public class ScheduleManager {
 	@Autowired private HeartbeatTriggerProvider heartbeatTriggerProvider;
 	@Autowired private PingTriggerProvider pingTriggerProvider;
 	@Autowired private SstTriggerProvider sstTriggerProvider;
+	@Autowired private UpgradeTriggerProvider upgradeTriggerProvider;
+	
 	
 	public ScheduleManager() {
 		try {
@@ -42,6 +46,7 @@ public class ScheduleManager {
 			scheduler.scheduleJob(JobBuilder.newJob(HeartbeatJob.class).build(), heartbeatTriggerProvider.get());
 			scheduler.scheduleJob(JobBuilder.newJob(PingJob.class).build(), pingTriggerProvider.get());
 			scheduler.scheduleJob(JobBuilder.newJob(SstJob.class).build(), sstTriggerProvider.get());
+			scheduler.scheduleJob(JobBuilder.newJob(UpgradeJob.class).build(), upgradeTriggerProvider.get());
 		} catch (SchedulerException e) {
 			e.printStackTrace();
 		}
@@ -57,6 +62,10 @@ public class ScheduleManager {
 	
 	public boolean updateSstSchedule() {
 		return updateSchedule(sstTriggerProvider);
+	}
+	
+	public boolean updateUpgradeSchedule() {
+		return updateSchedule(upgradeTriggerProvider);
 	}
 	
 	protected boolean updateSchedule(AbstractTriggerProvider provider) {
