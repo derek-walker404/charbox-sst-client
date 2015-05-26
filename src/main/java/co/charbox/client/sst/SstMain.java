@@ -4,8 +4,9 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -18,15 +19,16 @@ import co.charbox.domain.model.auth.TokenAuthModel;
 import com.tpofof.core.App;
 import com.tpofof.core.utils.Config;
 
+@Slf4j
+@Setter
 @Component
 public class SstMain implements Runnable {
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(SstMain.class);
-
-	private final String host;
-	private final int port;
+	private String host;
+	private int port;
 	private final String deviceId;
 	private final String deviceKey;
+	private boolean generateDeviceToken = true; // used for local host tests to evaluate the speed of the network stack on the device.
 	@Autowired private ClientChartbotApiClient client;
 
 	@Autowired
@@ -38,11 +40,19 @@ public class SstMain implements Runnable {
 	}
 
 	public void run() {
+		Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 		try {
 			Socket sock = new Socket(host, port);
 			MyIOHAndler io = new MyIOHAndler(sock);
 			
-			initConnection(io, client.generateDeviceToken(deviceId, deviceKey, "sst"));
+			TokenAuthModel deviceToken = generateDeviceToken 
+					? client.generateDeviceToken(deviceId, deviceKey, "sst") 
+					: TokenAuthModel.builder()
+							.authAssetId(deviceId)
+							.token("asdf123")
+							.serviceId("sst")
+							.build();
+			initConnection(io, deviceToken);
 			
 			instructionLoop:
 			while (true) {
@@ -79,7 +89,7 @@ public class SstMain implements Runnable {
 		if (token == null) {
 			throw new RuntimeException("Could not authenticate with data api.");
 		}
-		LOGGER.debug(">>>Init Connection");
+		log.debug(">>>Init Connection");
 		try {
 			io.write(deviceId);
 			io.write(token.getToken());
@@ -90,7 +100,7 @@ public class SstMain implements Runnable {
 	
 	private void executeDownloadTest(MyIOHAndler io) throws IOException {
 		int size = io.readInt();
-		LOGGER.debug(">>>Download Test: " + size);
+		log.debug(">>>Download Test: " + size);
 		DataReceiver dr = new DataReceiver(io, size);
 		dr.run();
 		io.write(dr.getDuration());
@@ -98,12 +108,12 @@ public class SstMain implements Runnable {
 	
 	private void executeUploadTest(MyIOHAndler io) throws IOException {
 		int size = io.readInt();
-		LOGGER.debug(">>>Upload Test: " + size);
+		log.debug(">>>Upload Test: " + size);
 		new DataSender(io, SSTProperties.getDefaultDataChunk(), size).run();
 	}
 	
 	private void executePingTest(MyIOHAndler io) throws IOException {
-		LOGGER.debug(">>>Ping Test...");
+		log.debug(">>>Ping Test...");
 		long startTime = System.currentTimeMillis();
 		io.write("ping");
 		io.read();

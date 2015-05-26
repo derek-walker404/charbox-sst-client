@@ -25,7 +25,7 @@ public class MyIOHAndler {
 		}
 	}
 	
-	public void write(int i) throws IOException {
+	public void write(long i) throws IOException {
 		write(i + "");
 	}
 	

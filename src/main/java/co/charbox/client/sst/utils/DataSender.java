@@ -6,9 +6,9 @@ public class DataSender implements Runnable {
 
 	private MyIOHAndler io;
 	private String data;
-	private int size;
+	private long size;
 	
-	public DataSender(MyIOHAndler io, String data, int size) {
+	public DataSender(MyIOHAndler io, String data, long size) {
 		super();
 		this.io = io;
 		this.data = data;
@@ -17,10 +17,11 @@ public class DataSender implements Runnable {
 
 	public void run() {
 		try {
-			int iters = size/data.length();
+			long currCount = 0;
 			data += "\n";
-			for (int i=0;i<iters;i++) {
+			while (currCount <= size) {
 					io.write(data);
+					currCount += data.length() - 1;
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

@@ -6,18 +6,17 @@ import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import co.charbox.domain.model.PingResults;
 
+@Slf4j
 @Component
 public class PingCliParser {
 	
-	private static final Logger log = LoggerFactory.getLogger(PingCliParser.class);
-
 	public PingResults parse(BufferedReader in, String uri, String deviceId) throws IOException {
 		Pattern headerPattern = Pattern.compile("^---.+");
 		String s = null;
