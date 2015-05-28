@@ -1,5 +1,7 @@
 package co.charbox.client.sst.utils;
 
+import java.io.IOException;
+
 
 public class DataReceiver implements Runnable {
 
@@ -18,10 +20,14 @@ public class DataReceiver implements Runnable {
 	}
 
 	public void run() {
-		int currSize = 0;
+		long currSize = 0;
 		long startTime = System.currentTimeMillis();
 		while (currSize < size) {
-			currSize += io.read().length();
+			try {
+				currSize += io.readAndForget();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 		this.duration = (int)(System.currentTimeMillis() - startTime);
 	}

@@ -43,7 +43,7 @@ public class SstMain implements Runnable {
 		Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 		try {
 			Socket sock = new Socket(host, port);
-			MyIOHAndler io = new MyIOHAndler(sock);
+			MyIOHAndler io = new MyIOHAndler(sock, 4096);
 			
 			TokenAuthModel deviceToken = generateDeviceToken 
 					? client.generateDeviceToken(deviceId, deviceKey, "sst") 
@@ -54,9 +54,11 @@ public class SstMain implements Runnable {
 							.build();
 			initConnection(io, deviceToken);
 			
+			log.trace("Initialized connection");
+			
 			instructionLoop:
 			while (true) {
-				switch (io.read().charAt(0)) {
+				switch (io.read(true).charAt(0)) {
 				case 'D': {
 					executeDownloadTest(io);
 					break;
@@ -91,23 +93,22 @@ public class SstMain implements Runnable {
 		}
 		log.debug(">>>Init Connection");
 		try {
-			io.write(deviceId);
-			io.write(token.getToken());
+			io.write(deviceId + ":" + token.getToken(), true);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
 	private void executeDownloadTest(MyIOHAndler io) throws IOException {
-		int size = io.readInt();
+		long size = io.readLong(true);
 		log.debug(">>>Download Test: " + size);
 		DataReceiver dr = new DataReceiver(io, size);
 		dr.run();
-		io.write(dr.getDuration());
+		io.write(dr.getDuration(), true);
 	}
 	
 	private void executeUploadTest(MyIOHAndler io) throws IOException {
-		int size = io.readInt();
+		long size = io.readLong(true);
 		log.debug(">>>Upload Test: " + size);
 		new DataSender(io, SSTProperties.getDefaultDataChunk(), size).run();
 	}
@@ -115,9 +116,9 @@ public class SstMain implements Runnable {
 	private void executePingTest(MyIOHAndler io) throws IOException {
 		log.debug(">>>Ping Test...");
 		long startTime = System.currentTimeMillis();
-		io.write("ping");
-		io.read();
-		io.write((int)(System.currentTimeMillis() - startTime));
+		io.write("ping", false);
+		io.read(false);
+		io.write((int)(System.currentTimeMillis() - startTime), true);
 	}
 	
 	public static void main(String[] args) {

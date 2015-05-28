@@ -3,6 +3,7 @@ package co.charbox.client.sst;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,6 +27,8 @@ import co.charbox.domain.model.mm.MyCharboxConnection;
 @AllArgsConstructor
 public class SelfServerTestRunner implements Runnable {
 
+	private static final AtomicLong runnerCount = new AtomicLong(0);
+	
 	@NonNull private final Socket client;
 	@NonNull private Integer initialSize;
 	@NonNull private Integer minSendTime;
@@ -34,9 +37,10 @@ public class SelfServerTestRunner implements Runnable {
 
 	public void run() {
 		Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+		Thread.currentThread().setName("self-sst-runner-" + runnerCount.getAndIncrement());
 		try {
 			log.trace("Executing SelfServerSpeedTest...");
-			MyIOHAndler io = new MyIOHAndler(client);
+			MyIOHAndler io = new MyIOHAndler(client, 4096);
 			initResults(io);
 			log.trace("Initialized...");
 			
@@ -47,7 +51,7 @@ public class SelfServerTestRunner implements Runnable {
 			calculatePingSpeed(io);
 			log.trace("Ping Complete...");
 			
-			io.write("F");
+			io.write("F", true);
 			log.trace("Test Complete...");
 			
 			for (SstResultsHandler handler : handlers) {
@@ -68,9 +72,10 @@ public class SelfServerTestRunner implements Runnable {
 	}
 
 	private void initResults(MyIOHAndler io) throws InvalidDeviceTokenException {
-		String deviceId = io.read();
+		String[] deviceVals = io.read(true).split(":");
+		String deviceId = deviceVals[0];
 		log.debug("Read deviceId " + deviceId);
-		String deviceToken = io.read();
+		String deviceToken = deviceVals[1];
 		log.debug("Read deviceToken " + deviceToken);
 		this.results = SstResults.builder()
 			.deviceId(deviceId)
@@ -95,11 +100,8 @@ public class SelfServerTestRunner implements Runnable {
 			executeDownloadTest(currSize, io);
 			totalDownloadSize += currSize;
 			if (this.results.getDownloadDuration() >= this.minSendTime) {
-				double speed = this.results.getDownloadSpeed();
-				int duration = this.results.getDownloadDuration();
-				executeDownloadTest(currSize, io);
-				this.results.setDownloadSpeed(avg(this.results.getDownloadSpeed(), speed));
-				this.results.setDownloadDuration((int)avg(this.results.getDownloadDuration(), duration));
+				this.results.setDownloadSpeed(this.results.getDownloadSpeed());
+				this.results.setDownloadDuration(this.results.getDownloadDuration());
 				break;
 			} else {
 				currSize *= 2;
@@ -111,26 +113,23 @@ public class SelfServerTestRunner implements Runnable {
 	private void executeDownloadTest(long size, MyIOHAndler io) throws IOException {
 		log.trace("Download Test...");
 		this.results.setDownloadSize(size);
-		io.write("D");
-		io.write(size);
+		io.write("D", true);
+		io.write(size, true);
 		new DataSender(io, SSTProperties.getDefaultDataChunk(), size).run();
-		this.results.setDownloadDuration(io.readInt());
+		this.results.setDownloadDuration(io.readInt(true));
 		this.results.setDownloadSpeed(SpeedUtils.calcSpeed(results.getDownloadDuration(), size));
 	}
 	
 	private void calculateUploadSpeed(MyIOHAndler io) throws IOException {
 		// TODO: cache initial size??
-		int currSize = this.initialSize;
+		long currSize = this.initialSize;
 		long totalUploadSize = 0;
 		while (this.results.getUploadDuration() < this.minSendTime) {
 			executeUploadTest(currSize, io);
 			totalUploadSize += currSize;
 			if (this.results.getUploadDuration() >= this.minSendTime) {
-				double speed = this.results.getDownloadSpeed();
-				int duration = this.results.getDownloadDuration();
-				executeUploadTest(currSize, io);
-				this.results.setUploadSpeed(avg(this.results.getUploadSpeed(), speed));
-				this.results.setUploadDuration((int)avg(this.results.getUploadDuration(), duration));
+				this.results.setUploadSpeed(this.results.getUploadSpeed());
+				this.results.setUploadDuration(this.results.getUploadDuration());
 				break;
 			} else {
 				currSize *= 2;
@@ -140,10 +139,10 @@ public class SelfServerTestRunner implements Runnable {
 	}
 	
 	private void executeUploadTest(long size, MyIOHAndler io) throws IOException {
-//		System.out.println("Upload Test...");
+		log.trace("Upload Test...");
 		this.results.setUploadSize(size);
-		io.write("U");
-		io.write(size);
+		io.write("U", true);
+		io.write(size, true);
 		DataReceiver dr = new DataReceiver(io, size);
 		dr.run();
 		this.results.setUploadDuration(dr.getDuration());
@@ -159,9 +158,9 @@ public class SelfServerTestRunner implements Runnable {
 	
 	private void executePingTest(MyIOHAndler io) throws IOException {
 		log.trace("Ping Test...");
-		io.write("P");
-		io.write(io.read());
-		this.results.setPingDuration(io.readInt());
+		io.write("P", true);
+		io.write(io.read(false), false);
+		this.results.setPingDuration(io.readInt(true));
 	}
 	
 	private double avg(double a, double b) {

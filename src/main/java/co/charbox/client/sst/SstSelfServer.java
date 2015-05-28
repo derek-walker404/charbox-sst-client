@@ -34,7 +34,7 @@ public class SstSelfServer implements Runnable {
 	
 	@Autowired
 	public SstSelfServer(Config config, ConsoleSstResultsHandler consoleHandler) throws IOException {
-		sock = new ServerSocket(31415);
+		sock = new ServerSocket(31416);
 		this.initialSize = config.getInt("sst.initialSize", 6000);
 		this.minSendTime = config.getInt("sst.minSendTime", 3000);
 		this.es = (ThreadPoolExecutor) Executors.newFixedThreadPool(config.getInt("sst.executor.threadCount", 1));

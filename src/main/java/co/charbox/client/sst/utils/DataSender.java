@@ -17,11 +17,12 @@ public class DataSender implements Runnable {
 
 	public void run() {
 		try {
-			long currCount = 0;
-			data += "\n";
-			while (currCount <= size) {
-					io.write(data);
-					currCount += data.length() - 1;
+			long currSize = 0;
+			byte[] rawData = data.getBytes();
+			int length = rawData.length;
+			while (currSize < size) {
+					io.write(rawData, length);
+					currSize += length;
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
