@@ -33,8 +33,7 @@ public class SstSelfServer implements Runnable {
 	private final AtomicBoolean keepGoing = new AtomicBoolean(false);
 	
 	@Autowired
-	public SstSelfServer(Config config, ConsoleSstResultsHandler consoleHandler) throws IOException {
-		sock = new ServerSocket(31416);
+	public SstSelfServer(Config config, ConsoleSstResultsHandler consoleHandler) {
 		this.initialSize = config.getInt("sst.initialSize", 6000);
 		this.minSendTime = config.getInt("sst.minSendTime", 3000);
 		this.es = (ThreadPoolExecutor) Executors.newFixedThreadPool(config.getInt("sst.executor.threadCount", 1));
@@ -55,7 +54,13 @@ public class SstSelfServer implements Runnable {
 		return "SSTServer [intialSize=" + initialSize + ", minSendTime=" + minSendTime + "]";
 	}
 	
+	@Override
 	public void run() {
+		try {
+			sock = new ServerSocket(31416);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 		keepGoing.set(true);
 		while (keepGoing.get()) {
 			try {
@@ -91,13 +96,12 @@ public class SstSelfServer implements Runnable {
 		client.setPort(31415);
 		Thread clientThread = new Thread(group, client, "client");
 		serverThread.start();
-		while (server.keepGoing()) {
+		while (!server.keepGoing()) {
 			Thread.sleep(200);
 		}
 		clientThread.start();
 		clientThread.join(2 * 60 * 1000);
 		Thread.sleep(10 * 1000);
 		server.kill();
-		System.exit(0);
 	}
 }
