@@ -58,7 +58,8 @@ public class SstMain implements Runnable {
 			
 			instructionLoop:
 			while (true) {
-				switch (io.read(true).charAt(0)) {
+				char inst = io.read(true).charAt(0);
+				switch (inst) {
 				case 'D': {
 					executeDownloadTest(io);
 					break;
@@ -123,5 +124,6 @@ public class SstMain implements Runnable {
 	
 	public static void main(String[] args) {
 		App.getContext().getBean(SstMain.class).run();
+		System.exit(0);
 	}
 }

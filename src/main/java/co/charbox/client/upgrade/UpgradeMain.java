@@ -18,7 +18,7 @@ import com.tpofof.core.utils.Config;
 import com.tpofof.core.utils.json.JsonUtils;
 
 /**
- * Reboot Hint: http://ubuntuforums.org/showthread.php?t=1035397
+ * Reboot Hint: http://askubuntu.com/questions/168879/shutdown-from-terminal-without-entering-password
  * 
  * @author david
  */
