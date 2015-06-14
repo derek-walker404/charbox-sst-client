@@ -2,7 +2,6 @@ package co.charbox.client.ping;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -70,11 +69,5 @@ public class PingCliParser {
 						Double.parseDouble(m.group(4)) 
 					}
 				: null;
-	}
-	
-	public static void main(String[] args) {
-		PingCliParser p = new PingCliParser();
-		System.out.println(Arrays.toString(p.parsePacketLossRow("10 packets transmitted, 10 received, 0% packet loss, time 1829ms")));
-		System.out.println(Arrays.toString(p.parseLatenctRow("rtt min/avg/max/mdev = 28.796/153.635/626.992/197.737 ms, pipe 4")));
 	}
 }
