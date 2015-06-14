@@ -8,6 +8,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.ApplicationContext;
@@ -21,6 +23,7 @@ import com.google.api.client.util.Lists;
 import com.tpofof.core.App;
 import com.tpofof.core.utils.Config;
 
+@Slf4j
 @Component
 @Scope(BeanDefinition.SCOPE_SINGLETON)
 public class SstSelfServer implements Runnable {
@@ -65,7 +68,7 @@ public class SstSelfServer implements Runnable {
 		while (keepGoing.get()) {
 			try {
 				Socket client = sock.accept();
-				System.out.println("Just connected to "
+				log.debug("Just connected to "
 		                  + client.getRemoteSocketAddress());
 				
 	            es.execute(SelfServerTestRunner.builder()
