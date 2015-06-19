@@ -58,6 +58,9 @@ public class SstMain implements Runnable {
 			
 			instructionLoop:
 			while (true) {
+				if (sock.isClosed()) {
+					return;
+				}
 				char inst = io.read(true).charAt(0);
 				switch (inst) {
 				case 'D': {
