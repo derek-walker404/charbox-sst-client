@@ -130,7 +130,12 @@ public class MyIOHAndler {
 	
 	public int read(byte[] arr) throws IOException {
 		int length = 0;
+		long loopCount = 0;
 		while (length == 0) {
+			if (loopCount++ == 1000000) {
+				loopCount = 0;
+				log.warn("Wheels spinning");
+			}
 			length = bis.read(arr, length, arr.length - length);
 		}
 		return length;

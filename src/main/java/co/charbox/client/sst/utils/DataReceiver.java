@@ -2,7 +2,9 @@ package co.charbox.client.sst.utils;
 
 import java.io.IOException;
 
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class DataReceiver implements Runnable {
 
 	private MyIOHAndler io;
@@ -22,11 +24,21 @@ public class DataReceiver implements Runnable {
 	public void run() {
 		long currSize = 0;
 		long startTime = System.currentTimeMillis();
+		long loopCount = 0;
 		while (currSize < size) {
+			if (loopCount++ >= 1000000) {
+				loopCount = 0;
+				log.warn("Wheels Spinning! currSize: " + currSize + " expectedSize: " + size);
+			}
 			try {
-				currSize += io.readAndForget();
+				int bytesReceived = io.readAndForget();
+				currSize += bytesReceived;
+				if (bytesReceived > 0) {
+					loopCount = 0;
+				}
 			} catch (IOException e) {
-				e.printStackTrace();
+				log.error(e.getMessage());
+				return;
 			}
 		}
 		this.duration = (int)(System.currentTimeMillis() - startTime);
