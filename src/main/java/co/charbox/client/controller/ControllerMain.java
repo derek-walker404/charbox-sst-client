@@ -3,6 +3,7 @@ package co.charbox.client.controller;
 import lombok.extern.slf4j.Slf4j;
 import co.charbox.client.ClientMain;
 import co.charbox.client.hb.HeartbeatMain;
+import co.charbox.client.logtest.LogTestMain;
 import co.charbox.client.ping.PingMain;
 import co.charbox.client.sst.SstMain;
 import co.charbox.client.sst.SstSelfServer;
@@ -42,6 +43,11 @@ public class ControllerMain {
 			log.info("Starting Upgrade");
 			UpgradeMain.main(args);
 			log.info("Upgrade Complete, exiting client.");
+			System.exit(0);
+		} else if (args[0].equals("log-test")) {
+			log.info("Starting Log Test");
+			LogTestMain.main(args);
+			log.info("Logtest Complete, exiting client.");
 			System.exit(0);
 		} else {
 			throw new IllegalArgumentException("Expected valid command. [client, sst, ping, hb]");
