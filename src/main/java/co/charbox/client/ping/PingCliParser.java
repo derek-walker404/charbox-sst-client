@@ -10,26 +10,28 @@ import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
 
+import co.charbox.domain.model.DeviceModel;
 import co.charbox.domain.model.PingResults;
 
 @Slf4j
 @Component
 public class PingCliParser {
 	
-	public PingResults parse(BufferedReader in, String uri, String deviceId) throws IOException {
+	public PingResults parse(BufferedReader in, String uri, Integer deviceId) throws IOException {
 		Pattern headerPattern = Pattern.compile("^---.+");
 		String s = null;
 		while ((s = in.readLine()) != null) {
 		    if (headerPattern.matcher(s).find()) {
 		    	PingResults results = PingResults.builder()
-		    			.deviceId(deviceId)
+		    			.device(DeviceModel.builder()
+		    					.id(deviceId)
+		    					.build())
 		    			.uri(uri)
-		    			.testStartTime(new DateTime())
+		    			.startTime(new DateTime())
 		    			.build();
 		    	String row = in.readLine();
 		    	Number[] packetLossVals = parsePacketLossRow(row);
 		    	if (packetLossVals != null) {
-		    		results.setPacketCount(packetLossVals[0].intValue());
 		    		results.setPacketLoss(packetLossVals[1].doubleValue());
 		    	} else {
 		    		log.error("Could not parse packet loss row! " + row);
@@ -40,7 +42,6 @@ public class PingCliParser {
 		    		results.setMinLatency(latenctRowVals[0].doubleValue());
 		    		results.setAvgLatency(latenctRowVals[1].doubleValue());
 		    		results.setMaxLatency(latenctRowVals[2].doubleValue());
-		    		results.setLatencyStdDev(latenctRowVals[3].doubleValue());
 		    	} else {
 		    		log.error("Could not parse latenct row! " + row);
 		    	}

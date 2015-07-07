@@ -41,7 +41,7 @@ public class PingMain implements Runnable {
 			Process proc = pb.start();
 			BufferedReader in = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 			
-			PingResults pingResults = parser.parse(in, uri, config.getString("device.id"));
+			PingResults pingResults = parser.parse(in, uri, config.getInt("device.id"));
 			
 			for (IResultsHandlers<PingResults> h : pingHandlers) {
 				h.handle(pingResults);

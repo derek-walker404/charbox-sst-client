@@ -26,7 +26,7 @@ public class SstMain implements Runnable {
 	
 	private String host;
 	private int port;
-	private final String deviceId;
+	private final Integer deviceId;
 	private final String deviceKey;
 	private boolean generateDeviceToken = true; // used for local host tests to evaluate the speed of the network stack on the device.
 	@Autowired private ClientChartbotApiClient client;
@@ -35,7 +35,7 @@ public class SstMain implements Runnable {
 	public SstMain(Config config) {
 		host = config.getString("sst.server.ip", "127.0.0.1");
 		port = config.getInt("sst.server.port", 31415);
-		deviceId = config.getString("device.id", "test-dev");
+		deviceId = config.getInt("device.id");
 		deviceKey = config.getString("device.api.key", "asdf123");
 	}
 
@@ -50,7 +50,7 @@ public class SstMain implements Runnable {
 					: TokenAuthModel.builder()
 							.authAssetId(deviceId)
 							.token("asdf123")
-							.serviceId("sst")
+							.serviceName("sst")
 							.build();
 			initConnection(io, deviceToken);
 			

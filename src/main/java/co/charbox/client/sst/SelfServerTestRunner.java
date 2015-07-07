@@ -17,10 +17,11 @@ import co.charbox.client.sst.utils.DataReceiver;
 import co.charbox.client.sst.utils.DataSender;
 import co.charbox.client.sst.utils.MyIOHAndler;
 import co.charbox.core.utils.SpeedUtils;
-import co.charbox.domain.model.MyLocation;
-import co.charbox.domain.model.SstResults;
+import co.charbox.domain.model.DeviceModel;
+import co.charbox.domain.model.SstResultsModel;
 import co.charbox.domain.model.mm.ConnectionInfoModel;
-import co.charbox.domain.model.mm.MyCharboxConnection;
+import co.charbox.domain.model.mm.ConnectionModel;
+import co.charbox.domain.model.mm.SimpleLocationModel;
 
 @Slf4j
 @Builder
@@ -33,7 +34,7 @@ public class SelfServerTestRunner implements Runnable {
 	@NonNull private Integer initialSize;
 	@NonNull private Integer minSendTime;
 	@NonNull private List<SstResultsHandler> handlers;
-	private SstResults results;
+	private SstResultsModel results;
 
 	public void run() {
 		Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
@@ -73,23 +74,25 @@ public class SelfServerTestRunner implements Runnable {
 
 	private void initResults(MyIOHAndler io) throws InvalidDeviceTokenException {
 		String[] deviceVals = io.read(true).split(":");
-		String deviceId = deviceVals[0];
+		Integer deviceId = Integer.parseInt(deviceVals[0]);
 		log.debug("Read deviceId " + deviceId);
 		String deviceToken = deviceVals[1];
 		log.debug("Read deviceToken " + deviceToken);
-		this.results = SstResults.builder()
-			.deviceId(deviceId)
-			.deviceToken(deviceToken)
-			.testStartTime(new DateTime())
-			.deviceInfo(ConnectionInfoModel.builder()
-					.connection(MyCharboxConnection.builder()
-							.ip(io.getRemoteIp())
-							.build())
-					.build())
-			.serverLocation(MyLocation.builder()
-					.ip("") // TODO
-					.build())
-			.build();
+		this.results = SstResultsModel.builder()
+				.device(DeviceModel.builder()
+						.id(deviceId)
+						.build())
+				.deviceToken(deviceToken)
+				.startTime(new DateTime())
+				.deviceInfo(ConnectionInfoModel.builder()
+						.connection(ConnectionModel.builder()
+								.ip(io.getRemoteIp())
+								.build())
+						.build())
+				.serverLocation(SimpleLocationModel.builder()
+						.ip("") // TODO
+						.build())
+				.build();
 	}
 	
 	private void calculateDownloadSpeed(MyIOHAndler io) throws IOException {

@@ -1,6 +1,7 @@
 package co.charbox.client.utils;
 
 import java.io.IOException;
+import java.io.Serializable;
 
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -25,7 +26,7 @@ public class ClientChartbotApiClient {
 	@Autowired private HttpClientProvider httpClientProvider;
 	@Autowired private JsonUtils json;
 	
-	public TokenAuthModel generateDeviceToken(String deviceId, String deviceApiKey, String serviceId) {
+	public TokenAuthModel generateDeviceToken(Serializable deviceId, String deviceApiKey, String serviceId) {
 		PostMethod pm = new PostMethod(config.getString("charbot.api.uri", "http://localhost:8080") + "/tokenauth/" + serviceId + "/new");
 		pm.addRequestHeader(new AuthorizationHeader(deviceId, deviceApiKey));
 		try {

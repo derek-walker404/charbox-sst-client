@@ -9,7 +9,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import co.charbox.domain.model.SstResults;
+import co.charbox.domain.model.SstResultsModel;
 
 import com.tpofof.core.utils.json.JsonUtils;
 
@@ -20,7 +20,7 @@ public class ConsoleSstResultsHandler implements SstResultsHandler {
 
 	@Autowired private JsonUtils json;
 	
-	public boolean handle(SstResults results, Socket client) {
+	public boolean handle(SstResultsModel results, Socket client) {
 		log.info(json.toJson(results));
 		log.info(client.getRemoteSocketAddress().toString());
 		return true;
