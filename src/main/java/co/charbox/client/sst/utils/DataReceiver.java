@@ -29,6 +29,13 @@ public class DataReceiver implements Runnable {
 			if (loopCount++ >= 1000000) {
 				loopCount = 0;
 				log.warn("Wheels Spinning! currSize: " + currSize + " expectedSize: " + size);
+				if (System.currentTimeMillis() - startTime > 5000) {
+					this.duration = -1;
+					return;
+				}
+			}
+			if (currSize < 0) {
+				throw new RuntimeException("Something went wrong. Size is less than 0.");
 			}
 			try {
 				int bytesReceived = io.readAndForget();

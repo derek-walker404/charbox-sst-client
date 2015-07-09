@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import com.tpofof.core.utils.json.JsonUtils;
 
 import co.charbox.client.ping.CharbotApiPingResultsHanlder;
-import co.charbox.domain.model.PingResults;
+import co.charbox.domain.model.PingResultModel;
 /**
  * TODO: GET THIS WORKING 
  *  
@@ -24,9 +24,9 @@ public class CharbotClientConfiguration {
 	@Autowired private JsonUtils json;
 	
 	@Bean(name="pingResultsHandlers")
-	public List<IResultsHandlers<PingResults>> pingResultsHandlers() {
-		List<IResultsHandlers<PingResults>> handlers = Lists.newArrayList();
-		handlers.add(new ConsoleResultHandler<PingResults>(json));
+	public List<IResultsHandlers<PingResultModel>> pingResultsHandlers() {
+		List<IResultsHandlers<PingResultModel>> handlers = Lists.newArrayList();
+		handlers.add(new ConsoleResultHandler<PingResultModel>(json));
 		handlers.add(charbotApiPingResultsHanlder);
 		return handlers;
 	}

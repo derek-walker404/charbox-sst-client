@@ -11,18 +11,18 @@ import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
 
 import co.charbox.domain.model.DeviceModel;
-import co.charbox.domain.model.PingResults;
+import co.charbox.domain.model.PingResultModel;
 
 @Slf4j
 @Component
 public class PingCliParser {
 	
-	public PingResults parse(BufferedReader in, String uri, Integer deviceId) throws IOException {
+	public PingResultModel parse(BufferedReader in, String uri, Integer deviceId) throws IOException {
 		Pattern headerPattern = Pattern.compile("^---.+");
 		String s = null;
 		while ((s = in.readLine()) != null) {
 		    if (headerPattern.matcher(s).find()) {
-		    	PingResults results = PingResults.builder()
+		    	PingResultModel results = PingResultModel.builder()
 		    			.device(DeviceModel.builder()
 		    					.id(deviceId)
 		    					.build())

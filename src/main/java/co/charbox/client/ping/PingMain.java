@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 import co.charbox.client.utils.ConsoleResultHandler;
 import co.charbox.client.utils.IResultsHandlers;
-import co.charbox.domain.model.PingResults;
+import co.charbox.domain.model.PingResultModel;
 
 import com.google.api.client.util.Lists;
 import com.tpofof.core.App;
@@ -22,13 +22,13 @@ public class PingMain implements Runnable {
 
 	@Autowired private Config config;
 	@Autowired private PingCliParser parser;
-	private List<IResultsHandlers<PingResults>> pingHandlers;
+	private List<IResultsHandlers<PingResultModel>> pingHandlers;
 	
 	@Autowired
 	public PingMain(CharbotApiPingResultsHanlder apiHandler, JsonUtils json) {
 		pingHandlers = Lists.newArrayList();
 		pingHandlers.add(apiHandler);
-		pingHandlers.add(new ConsoleResultHandler<PingResults>(json));
+		pingHandlers.add(new ConsoleResultHandler<PingResultModel>(json));
 	}
 	
 	public void run() {
@@ -41,9 +41,9 @@ public class PingMain implements Runnable {
 			Process proc = pb.start();
 			BufferedReader in = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 			
-			PingResults pingResults = parser.parse(in, uri, config.getInt("device.id"));
+			PingResultModel pingResults = parser.parse(in, uri, config.getInt("device.id"));
 			
-			for (IResultsHandlers<PingResults> h : pingHandlers) {
+			for (IResultsHandlers<PingResultModel> h : pingHandlers) {
 				h.handle(pingResults);
 			}
 		} catch (IOException e) {

@@ -100,8 +100,11 @@ public class SelfServerTestRunner implements Runnable {
 		long currSize = this.initialSize;
 		long totalDownloadSize = 0;
 		while (this.results.getDownloadDuration() < this.minSendTime) {
-			executeDownloadTest(currSize, io);
 			totalDownloadSize += currSize;
+			if (!executeDownloadTest(currSize, io)) {
+				log.warn("something is fucky... trying again... " + currSize);
+				continue;
+			}
 			if (this.results.getDownloadDuration() >= this.minSendTime) {
 				this.results.setDownloadSpeed(this.results.getDownloadSpeed());
 				this.results.setDownloadDuration(this.results.getDownloadDuration());
@@ -113,14 +116,19 @@ public class SelfServerTestRunner implements Runnable {
 		log.debug("Total Download: " + totalDownloadSize/1024/1024 + "Mbs");
 	}
 	
-	private void executeDownloadTest(long size, MyIOHAndler io) throws IOException {
+	private boolean executeDownloadTest(long size, MyIOHAndler io) throws IOException {
 		log.trace("Download Test...");
 		this.results.setDownloadSize(size);
 		io.write("D", true);
 		io.write(size, true);
 		new DataSender(io, SSTProperties.getDefaultDataChunk(), size).run();
-		this.results.setDownloadDuration(io.readInt(true));
+		int duration = io.readInt(true);
+		if (duration < 0) {
+			return false;
+		}
+		this.results.setDownloadDuration(duration);
 		this.results.setDownloadSpeed(SpeedUtils.calcSpeed(results.getDownloadDuration(), size));
+		return true;
 	}
 	
 	private void calculateUploadSpeed(MyIOHAndler io) throws IOException {
@@ -128,8 +136,11 @@ public class SelfServerTestRunner implements Runnable {
 		long currSize = this.initialSize;
 		long totalUploadSize = 0;
 		while (this.results.getUploadDuration() < this.minSendTime) {
-			executeUploadTest(currSize, io);
 			totalUploadSize += currSize;
+			if (!executeUploadTest(currSize, io)) {
+				log.warn("something is fucky... trying again... " + currSize);
+				continue;
+			}
 			if (this.results.getUploadDuration() >= this.minSendTime) {
 				this.results.setUploadSpeed(this.results.getUploadSpeed());
 				this.results.setUploadDuration(this.results.getUploadDuration());
@@ -138,18 +149,22 @@ public class SelfServerTestRunner implements Runnable {
 				currSize *= 2;
 			}
 		}
-		log.debug("Total Upload: " + totalUploadSize/1024/1024 + "Mbs");
+		log.debug("Total Upload: " + totalUploadSize/1024/1024 + "Mb");
 	}
 	
-	private void executeUploadTest(long size, MyIOHAndler io) throws IOException {
+	private boolean executeUploadTest(long size, MyIOHAndler io) throws IOException {
 		log.trace("Upload Test...");
 		this.results.setUploadSize(size);
 		io.write("U", true);
 		io.write(size, true);
 		DataReceiver dr = new DataReceiver(io, size);
 		dr.run();
+		if (dr.getDuration() < 0) {
+			return false;
+		}
 		this.results.setUploadDuration(dr.getDuration());
 		this.results.setUploadSpeed(SpeedUtils.calcSpeed(results.getUploadDuration(), size));
+		return true;
 	}
 	
 	private void calculatePingSpeed(MyIOHAndler io) throws IOException {

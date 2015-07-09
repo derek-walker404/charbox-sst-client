@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import co.charbox.domain.model.DeviceVersionModel;
-import co.charbox.domain.model.PingResults;
+import co.charbox.domain.model.PingResultModel;
 import co.charbox.domain.model.auth.TokenAuthModel;
 
 import com.tpofof.core.utils.AuthorizationHeader;
@@ -58,7 +58,7 @@ public class ClientChartbotApiClient {
 		return false;
 	}
 
-	public boolean postPingResults(PingResults model, String deviceId, String deviceApiKey) {
+	public boolean postPingResults(PingResultModel model, String deviceId, String deviceApiKey) {
 		PostMethod pm = new PostMethod(config.getString("charbot.api.uri", "http://localhost:8080") + "/pingres");
 		pm.addRequestHeader(new AuthorizationHeader(deviceId, deviceApiKey));
 		try {

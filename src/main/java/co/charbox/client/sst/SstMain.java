@@ -35,7 +35,7 @@ public class SstMain implements Runnable {
 	public SstMain(Config config) {
 		host = config.getString("sst.server.ip", "127.0.0.1");
 		port = config.getInt("sst.server.port", 31415);
-		deviceId = config.getInt("device.id");
+		deviceId = config.getInt("device.id", -1);
 		deviceKey = config.getString("device.api.key", "asdf123");
 	}
 
@@ -126,7 +126,11 @@ public class SstMain implements Runnable {
 	}
 	
 	public static void main(String[] args) {
-		App.getContext().getBean(SstMain.class).run();
+		try {
+			App.getContext().getBean(SstMain.class).run();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		System.exit(0);
 	}
 }
