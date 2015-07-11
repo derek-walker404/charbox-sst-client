@@ -10,9 +10,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import co.charbox.client.sst.utils.DataReceiver;
-import co.charbox.client.sst.utils.DataSender;
-import co.charbox.client.sst.utils.MyIOHAndler;
+import co.charbot.sst.SSTProperties;
+import co.charbot.sst.utils.DataReceiver;
+import co.charbot.sst.utils.DataSender;
+import co.charbot.sst.utils.MyIOHAndler;
 import co.charbox.client.utils.ClientChartbotApiClient;
 import co.charbox.domain.model.auth.TokenAuthModel;
 

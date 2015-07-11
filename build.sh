@@ -1,7 +1,8 @@
 #!/bin/bash
 
 
-cd ../tpofof-core/;mvn clean install; cd ../charbox-dataapi/
-cd ../charbox-domain/;mvn clean install; cd ../charbox-dataapi/
-cd ../charbox-core/;mvn clean install; cd ../charbox-dataapi/
-cd ../charbox-client/;mvn clean install;cd ../charbox-sst/
+cd ~/Workspace/java/tpofof-core/;mvn clean install -DskipTests
+cd ~/Workspace/java/charbox-domain/;mvn clean install -DskipTests
+cd ~/Workspace/java/charbox-core/;mvn clean install -DskipTests
+cd ~/Workspace/java/charbox-sst-common/;mvn clean install -DskipTests
+cd ~/Workspace/java/charbox-client/;mvn clean install -DskipTests

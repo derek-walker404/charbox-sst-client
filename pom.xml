@@ -6,13 +6,13 @@
 	<version>0.1.1-SNAPSHOT</version>
 	<name>Server Speed Test Client</name>
 	<properties>
-		<charbox-core.version>0.1.0-SNAPSHOT</charbox-core.version>
+		<charbox-sst-common.version>0.1.0-SNAPSHOT</charbox-sst-common.version>
 	</properties>
 	<dependencies>
 		<dependency>
-			<groupId>co.charbox</groupId>
-			<artifactId>core</artifactId>
-			<version>${charbox-core.version}</version>
+			<groupId>co.charbot</groupId>
+			<artifactId>sst-common</artifactId>
+			<version>${charbox-sst-common.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-logging</groupId>
