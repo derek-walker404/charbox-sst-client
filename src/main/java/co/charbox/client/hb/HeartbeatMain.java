@@ -20,5 +20,6 @@ public class HeartbeatMain implements Runnable {
 	
 	public static void main(String[] args) {
 		App.getContext().getBean(HeartbeatMain.class).run();
+		System.exit(0);
 	}
 }
