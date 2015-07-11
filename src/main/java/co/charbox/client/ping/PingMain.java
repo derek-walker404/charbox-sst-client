@@ -53,5 +53,6 @@ public class PingMain implements Runnable {
 	
 	public static void main(String[] args) {
 		App.getContext().getBean(PingMain.class).run();
+		System.exit(0);
 	}
 }

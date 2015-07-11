@@ -106,7 +106,6 @@ public class SstMain implements Runnable {
 	
 	private void executeDownloadTest(MyIOHAndler io) throws IOException {
 		long size = io.readLong(true);
-		log.debug(">>>Download Test: " + size);
 		DataReceiver dr = new DataReceiver(io, size);
 		dr.run();
 		io.write(dr.getDuration(), true);
@@ -114,7 +113,6 @@ public class SstMain implements Runnable {
 	
 	private void executeUploadTest(MyIOHAndler io) throws IOException {
 		long size = io.readLong(true);
-		log.debug(">>>Upload Test: " + size);
 		new DataSender(io, SSTProperties.getDefaultDataChunk(), size).run();
 	}
 	
