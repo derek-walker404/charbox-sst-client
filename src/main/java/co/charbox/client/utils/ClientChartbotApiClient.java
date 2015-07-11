@@ -3,6 +3,8 @@ package co.charbox.client.utils;
 import java.io.IOException;
 import java.io.Serializable;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
@@ -19,6 +21,7 @@ import com.tpofof.core.utils.Config;
 import com.tpofof.core.utils.HttpClientProvider;
 import com.tpofof.core.utils.json.JsonUtils;
 
+@Slf4j
 @Component
 public class ClientChartbotApiClient {
 
@@ -44,7 +47,9 @@ public class ClientChartbotApiClient {
 	}
 
 	public boolean heartbeat(String deviceId, String deviceApiKey) {
-		PostMethod pm = new PostMethod(config.getString("charbot.api.url", "http://localhost:8080") + "/devices/id/" + deviceId + "/hb");
+		String url = config.getString("charbot.api.url", "http://localhost:8080") + "/devices/id/" + deviceId + "/hb";
+		log.debug("Hb Url: " + url);
+		PostMethod pm = new PostMethod(url);
 		pm.addRequestHeader(new AuthorizationHeader(deviceId, deviceApiKey));
 		try {
 			return 200 == httpClientProvider.get().executeMethod(pm);
