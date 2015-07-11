@@ -16,8 +16,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import co.charbox.client.sst.results.ConsoleSstResultsHandler;
-import co.charbox.client.sst.results.SstResultsHandler;
+import co.charbot.sst.results.ConsoleSstResultsHandler;
+import co.charbot.sst.results.SstResultsHandler;
 
 import com.google.api.client.util.Lists;
 import com.tpofof.core.App;
