@@ -27,7 +27,7 @@ public class ClientChartbotApiClient {
 	@Autowired private JsonUtils json;
 	
 	public TokenAuthModel generateDeviceToken(Serializable deviceId, String deviceApiKey, String serviceId) {
-		PostMethod pm = new PostMethod(config.getString("charbot.api.uri", "http://localhost:8080") + "/tokenauth/" + serviceId + "/new");
+		PostMethod pm = new PostMethod(config.getString("charbot.api.url", "http://localhost:8080") + "/tokenauth/" + serviceId + "/new");
 		pm.addRequestHeader(new AuthorizationHeader(deviceId, deviceApiKey));
 		try {
 			if (200 == httpClientProvider.get().executeMethod(pm)) {
@@ -44,7 +44,7 @@ public class ClientChartbotApiClient {
 	}
 
 	public boolean heartbeat(String deviceId, String deviceApiKey) {
-		PostMethod pm = new PostMethod(config.getString("charbot.api.uri", "http://localhost:8080") + "/devices/id/" + deviceId + "/hb");
+		PostMethod pm = new PostMethod(config.getString("charbot.api.url", "http://localhost:8080") + "/devices/id/" + deviceId + "/hb");
 		pm.addRequestHeader(new AuthorizationHeader(deviceId, deviceApiKey));
 		try {
 			return 200 == httpClientProvider.get().executeMethod(pm);
@@ -59,7 +59,7 @@ public class ClientChartbotApiClient {
 	}
 
 	public boolean postPingResults(PingResultModel model, String deviceId, String deviceApiKey) {
-		PostMethod pm = new PostMethod(config.getString("charbot.api.uri", "http://localhost:8080") + "/pingres");
+		PostMethod pm = new PostMethod(config.getString("charbot.api.url", "http://localhost:8080") + "/pingres");
 		pm.addRequestHeader(new AuthorizationHeader(deviceId, deviceApiKey));
 		try {
 			pm.setRequestEntity(new StringRequestEntity(json.toJson(model), "application/json", "UTF-8"));
@@ -75,7 +75,7 @@ public class ClientChartbotApiClient {
 	}
 
 	public DeviceVersionModel queryUpgrade(String deviceId, String deviceApiKey, String version) {
-		GetMethod pm = new GetMethod(config.getString("charbot.api.uri", "http://localhost:8080") + "/versions/upgrade/" + version);
+		GetMethod pm = new GetMethod(config.getString("charbot.api.url", "http://localhost:8080") + "/versions/upgrade/" + version);
 		pm.addRequestHeader(new AuthorizationHeader(deviceId, deviceApiKey));
 		try {
 			if (200 == httpClientProvider.get().executeMethod(pm)) {
