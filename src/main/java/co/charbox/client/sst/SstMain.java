@@ -29,6 +29,7 @@ public class SstMain implements Runnable {
 	private int port;
 	private final Integer deviceId;
 	private final String deviceKey;
+	private final int ioBufferSize;
 	private boolean generateDeviceToken = true; // used for local host tests to evaluate the speed of the network stack on the device.
 	@Autowired private ClientChartbotApiClient client;
 
@@ -38,13 +39,14 @@ public class SstMain implements Runnable {
 		port = config.getInt("sst.server.port", 31415);
 		deviceId = config.getInt("device.id", -1);
 		deviceKey = config.getString("device.api.key", "asdf123");
+		ioBufferSize = config.getInt("sst.io.bufferSize", 131072);
 	}
 
 	public void run() {
 		Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 		try {
 			Socket sock = new Socket(host, port);
-			MyIOHAndler io = new MyIOHAndler(sock, 4096);
+			MyIOHAndler io = new MyIOHAndler(sock, ioBufferSize);
 			
 			TokenAuthModel deviceToken = generateDeviceToken 
 					? client.generateDeviceToken(deviceId, deviceKey, "sst") 
