@@ -3,10 +3,12 @@ package co.charbox.client.sst;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +31,10 @@ public class SstMain implements Runnable {
 	private int port;
 	private final Integer deviceId;
 	private final String deviceKey;
+	private final int ioBufferSize;
 	private boolean generateDeviceToken = true; // used for local host tests to evaluate the speed of the network stack on the device.
+	private DateTime expiration;
+	private AtomicBoolean done = new AtomicBoolean(false);
 	@Autowired private ClientChartbotApiClient client;
 
 	@Autowired
@@ -38,13 +43,23 @@ public class SstMain implements Runnable {
 		port = config.getInt("sst.server.port", 31415);
 		deviceId = config.getInt("device.id", -1);
 		deviceKey = config.getString("device.api.key", "asdf123");
+		ioBufferSize = config.getInt("sst.io.bufferSize", 131072);
+	}
+	
+	public DateTime getExpiration() {
+		return expiration;
+	}
+	
+	public boolean isDone() {
+		return done.get();
 	}
 
 	public void run() {
+		expiration = new DateTime().plusMinutes(1); // TODO: configurable?
 		Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 		try {
 			Socket sock = new Socket(host, port);
-			MyIOHAndler io = new MyIOHAndler(sock, 4096);
+			MyIOHAndler io = new MyIOHAndler(sock, ioBufferSize);
 			
 			TokenAuthModel deviceToken = generateDeviceToken 
 					? client.generateDeviceToken(deviceId, deviceKey, "sst") 
@@ -90,6 +105,7 @@ public class SstMain implements Runnable {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		done.set(true);
 	}
 
 	private void initConnection(MyIOHAndler io, TokenAuthModel token) {
