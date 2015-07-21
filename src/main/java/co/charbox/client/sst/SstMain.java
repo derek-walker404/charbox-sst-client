@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 
 import co.charbox.client.utils.ClientChartbotApiClient;
 import co.charbox.domain.model.auth.TokenAuthModel;
-import co.charbox.sst.SSTProperties;
 import co.charbox.sst.utils.DataReceiver;
 import co.charbox.sst.utils.DataSender;
 import co.charbox.sst.utils.MyIOHAndler;
@@ -129,7 +128,7 @@ public class SstMain implements Runnable {
 	
 	private void executeUploadTest(MyIOHAndler io) throws IOException {
 		long size = io.readLong(true);
-		new DataSender(io, SSTProperties.getDefaultDataChunk(), size).run();
+		new DataSender(io, size).run();
 	}
 	
 	private void executePingTest(MyIOHAndler io) throws IOException {

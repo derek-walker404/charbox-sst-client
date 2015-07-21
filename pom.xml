@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>co.charbox</groupId>
 	<artifactId>charbox-client</artifactId>
-	<version>0.1.4-SNAPSHOT</version>
+	<version>0.1.5-SNAPSHOT</version>
 	<name>Server Speed Test Client</name>
 	<properties>
 		<charbox-sst-common.version>0.1.0-SNAPSHOT</charbox-sst-common.version>
