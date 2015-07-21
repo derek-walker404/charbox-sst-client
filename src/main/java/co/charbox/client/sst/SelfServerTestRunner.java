@@ -124,7 +124,7 @@ public class SelfServerTestRunner implements Runnable {
 		io.write("D", true);
 		io.write(size, true);
 		new DataSender(io, SSTProperties.getDefaultDataChunk(), size).run();
-		int duration = io.readInt(true);
+		int duration = io.readInt(true) - results.getPingDuration();
 		if (duration < 0) {
 			return false;
 		}
@@ -161,10 +161,11 @@ public class SelfServerTestRunner implements Runnable {
 		io.write(size, true);
 		DataReceiver dr = new DataReceiver(io, size);
 		dr.run();
-		if (dr.getDuration() < 0) {
+		int duration = dr.getDuration() - results.getPingDuration();
+		if (duration < 0) {
 			return false;
 		}
-		this.results.setUploadDuration(dr.getDuration());
+		this.results.setUploadDuration(duration);
 		this.results.setUploadSpeed(SpeedUtils.calcSpeed(results.getUploadDuration(), size));
 		return true;
 	}
@@ -180,7 +181,7 @@ public class SelfServerTestRunner implements Runnable {
 		log.trace("Ping Test...");
 		io.write("P", true);
 		io.write(io.read(false), false);
-		this.results.setPingDuration(io.readInt(true));
+		this.results.setPingDuration(io.readInt(true) / 2);
 	}
 	
 	private double avg(double a, double b) {
